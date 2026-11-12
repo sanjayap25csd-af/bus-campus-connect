@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # BUS CAMPUS CONNECT
 ### SMART BUS REQUEST AND TRAVEL PLANNING FOR HOSTEL STUDENTS
 
@@ -150,3 +151,7 @@ The application directly satisfies and fulfills all 25 specific test cases:
 24. **Capacity Enforcement**: Over-allocation is strictly blocked if seats allocated reach maximum bus capacity (50/50 Full).
 25. **Database Persistence**: Restarting the Python application retains all records, allocations, and logs in `database.sqlite3`.
 26. **Request Cancellation and Rejection**: Students can cancel an unboarded request with a required reason. Management can reject requests with a required reason; the decision and reason are saved and the student receives an in-app notification.
+=======
+# bus-campus-connect
+maintaining college bus allocation
+>>>>>>> 964729761de0875c32c9b0b5a3fa5649053a44bd
