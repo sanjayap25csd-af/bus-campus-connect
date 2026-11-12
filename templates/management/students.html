@@ -1,0 +1,105 @@
+{% extends "management/base_management.html" %}
+
+{% block title %}Student Directory & ID Verification - Bus Campus Connect{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2rem;">
+  <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">Student Records</span>
+  <h1 style="font-size: 2rem; font-weight: 800; margin-top: 0.2rem;">Registered Student Directory</h1>
+  <p style="color: var(--text-secondary); font-size: 0.92rem;">
+    Review registered hostel students, inspect uploaded college ID cards, and manage verification status.
+  </p>
+</div>
+
+<!-- Search & Filter Controls -->
+<div class="card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+  <form method="GET" action="{{ url_for('management.students_view') }}" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: flex-end;">
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label" style="font-size: 0.78rem;">Search Register No / Name</label>
+      <input type="text" name="q" class="form-control" placeholder="Search by register number or name" value="{{ search or '' }}">
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label" style="font-size: 0.78rem;">Hostel</label>
+      <select name="hostel" class="form-control">
+        <option value="all">All Hostels</option>
+        {% for h in hostels %}
+          <option value="{{ h.id }}" {% if selected_hostel == h.id|string %}selected{% endif %}>{{ h.hostel_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+      <label class="form-label" style="font-size: 0.78rem;">ID Verification Status</label>
+      <select name="status" class="form-control">
+        <option value="all">All Statuses</option>
+        <option value="Pending" {% if selected_status == 'Pending' %}selected{% endif %}>Pending</option>
+        <option value="Verified" {% if selected_status == 'Verified' %}selected{% endif %}>Verified</option>
+        <option value="Rejected" {% if selected_status == 'Rejected' %}selected{% endif %}>Rejected</option>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 0.5rem;">
+      <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1rem;">Search</button>
+      <a href="{{ url_for('management.students_view') }}" class="btn btn-secondary" style="padding: 0.65rem 0.85rem;">Reset</a>
+    </div>
+  </form>
+</div>
+
+<!-- Student Table (Requirement 19) -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+      <span>Enrolled Hostel Students ({{ students|length }} Found)</span>
+    </div>
+  </div>
+
+  {% if students %}
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Register Number</th>
+            <th>Name</th>
+            <th>Hostel</th>
+            <th>Department</th>
+            <th>Year</th>
+            <th>Phone</th>
+            <th>ID Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+            <tr>
+              <td><span class="table-reg-no">{{ s.register_number }}</span></td>
+              <td><strong>{{ s.name }}</strong></td>
+              <td>{{ s.hostel_name }}</td>
+              <td style="font-size: 0.82rem; color: var(--text-secondary);">{{ s.department }}</td>
+              <td>Year {{ s.year }}</td>
+              <td>{{ s.phone }}</td>
+              <td>
+                <span class="badge {% if s.verification_status == 'Verified' %}badge-success{% elif s.verification_status == 'Rejected' %}badge-danger{% else %}badge-warning{% endif %}">
+                  {{ s.verification_status }}
+                </span>
+              </td>
+              <td>
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;"
+                        onclick="openIdCardModal('{{ s.id }}', '{{ url_for('uploaded_file', folder='id_cards', filename=s.id_card_path) if s.id_card_path else '' }}', '{{ s.name }}', '{{ s.register_number }}', '{{ s.verification_status }}')">
+                  {% if s.verification_status == 'Verified' %}View / Edit ID{% else %}Verify ID{% endif %}
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+      No student records match the search query.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+

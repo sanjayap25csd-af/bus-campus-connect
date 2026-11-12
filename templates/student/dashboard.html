@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Student Dashboard - Bus Campus Connect{% endblock %}
+
+{% block content %}
+<div class="student-content">
+  <!-- Student Profile Welcome Banner (Requirement 12) -->
+  <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%); border-left: 5px solid var(--primary);">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem;">
+      <div>
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">Student Portal</span>
+        <h1 style="font-size: 1.85rem; margin-top: 0.2rem;">Welcome, {{ student.name }}</h1>
+        <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-top: 0.6rem; font-size: 0.9rem; color: var(--text-secondary);">
+          <span>Register No: <strong class="table-reg-no">{{ student.register_number }}</strong></span>
+          <span>&bull;</span>
+          <span>Hostel: <strong>{{ student.hostel_name }}</strong></span>
+          <span>&bull;</span>
+          <span>Dept: <strong>{{ student.department }}</strong></span>
+          <span>&bull;</span>
+          <span>Year: <strong>Year {{ student.year }}</strong></span>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.3rem;">College ID Status</div>
+        {% if student.verification_status == 'Verified' %}
+          <span class="badge badge-success" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+            &check; ID Verified
+          </span>
+        {% elif student.verification_status == 'Rejected' %}
+          <span class="badge badge-danger" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+            &cross; ID Rejected
+          </span>
+        {% else %}
+          <span class="badge badge-warning" style="font-size: 0.85rem; padding: 0.35rem 0.85rem;">
+            &bull; ID Under Review
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Action Nav Cards (Requirement 12) -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+    <a href="{{ url_for('student.request_bus') }}" class="card" style="text-align: center; padding: 1.25rem 1rem; transition: var(--transition);">
+      <div style="width: 44px; height: 44px; background: var(--primary-light); color: var(--primary); border-radius: 12px; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+      </div>
+      <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">Request a Bus</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Book transit slot</div>
+    </a>
+
+    <a href="{{ url_for('student.my_requests') }}" class="card" style="text-align: center; padding: 1.25rem 1rem; transition: var(--transition);">
+      <div style="width: 44px; height: 44px; background: var(--info-light); color: var(--info); border-radius: 12px; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </div>
+      <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">My Requests</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">{{ total_requests_count }} submitted</div>
+    </a>
+
+    <a href="{{ url_for('student.notifications') }}" class="card" style="text-align: center; padding: 1.25rem 1rem; transition: var(--transition);">
+      <div style="width: 44px; height: 44px; background: var(--warning-light); color: var(--warning); border-radius: 12px; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center; position: relative;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        {% if unread_notifications > 0 %}
+          <span class="badge-notify" style="position: absolute; top: 0; right: 0;">{{ unread_notifications }}</span>
+        {% endif %}
+      </div>
+      <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">Notifications</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Alerts &amp; status</div>
+    </a>
+
+    <a href="{{ url_for('student.profile') }}" class="card" style="text-align: center; padding: 1.25rem 1rem; transition: var(--transition);">
+      <div style="width: 44px; height: 44px; background: var(--secondary-light); color: var(--secondary); border-radius: 12px; margin: 0 auto 0.75rem; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+      <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-primary);">Profile</div>
+      <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Account &amp; ID card</div>
+    </a>
+  </div>
+
+  <!-- Active Bus Boarding Banner if Allocated -->
+  {% if active_bus and active_bus.request_status in ['Bus Allocated', 'Boarding Open'] %}
+    <div class="card" style="margin-bottom: 2rem; background: #ecfdf5; border: 2px solid #10b981; border-radius: var(--radius-md); padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="badge badge-success" style="font-size: 0.75rem; text-transform: uppercase;">Bus Allocated &bull; Ready to Board</span>
+        <h3 style="font-size: 1.25rem; font-weight: 800; color: #064e3b; margin: 0.3rem 0 0.2rem;">
+          {{ active_bus.bus_number }} &mdash; {{ active_bus.bus_name }}
+        </h3>
+        <div style="font-size: 0.85rem; color: #047857;">
+          Departure: <strong>{{ active_bus.formatted_time }}</strong> &bull; Boarding Window: <strong>{{ active_bus.boarding_window_text }}</strong>
+        </div>
+      </div>
+      <div>
+        <form action="{{ url_for('student.confirm_boarding') }}" method="POST">
+          <input type="hidden" name="request_id" value="{{ active_bus.id }}">
+          <button type="submit" class="btn btn-success" style="font-size: 0.95rem; font-weight: 800; padding: 0.65rem 1.4rem;">
+            &check; Confirm Boarding
+          </button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Recent Travel Requests -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+        <span>Recent Travel Requests</span>
+      </div>
+      <a href="{{ url_for('student.my_requests') }}" class="btn btn-secondary btn-sm">View All &rarr;</a>
+    </div>
+
+    {% if requests %}
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Travel Date</th>
+              <th>Required Time</th>
+              <th>Travel Type</th>
+              <th>Proof Status</th>
+              <th>Request Status</th>
+              <th>Allocated Bus</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in requests %}
+              <tr>
+                <td><strong>{{ r.travel_date }}</strong></td>
+                <td>{{ r.formatted_time }}</td>
+                <td>
+                  <span class="badge {% if r.travel_type == 'Booked Bus / Ticket' %}badge-info{% elif r.travel_type == 'Special Permission' %}badge-warning{% else %}badge-secondary{% endif %}">
+                    {{ r.travel_type }}
+                  </span>
+                </td>
+                <td>
+                  {% if r.proof_path %}
+                    <span class="badge {% if r.proof_status == 'Verified' %}badge-success{% elif r.proof_status == 'Rejected' %}badge-danger{% elif r.proof_status in ['Uploaded', 'Under Review'] %}badge-warning{% else %}badge-secondary{% endif %}">
+                      {{ r.proof_status }}
+                    </span>
+                  {% elif r.proof_status == 'Verified' or r.id_card_status == 'Verified' %}
+                    <span class="badge badge-success" title="Student College ID is verified on file">&check; Verified</span>
+                  {% elif r.proof_status == 'Rejected' or r.id_card_status == 'Rejected' %}
+                    <span class="badge badge-danger">&cross; Rejected</span>
+                  {% elif r.travel_type == 'Booked Bus / Ticket' %}
+                    <span class="badge badge-warning">Ticket Required</span>
+                  {% else %}
+                    <span class="badge badge-warning">ID Pending</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge {% if r.request_status in ['Boarded', 'Verified'] %}badge-success{% elif r.request_status == 'Bus Allocated' %}badge-info{% elif r.request_status in ['Not Boarded', 'Rejected'] %}badge-danger{% elif r.request_status == 'Cancelled' %}badge-secondary{% else %}badge-warning{% endif %}">
+                    {{ r.request_status }}
+                  </span>
+                  {% if r.cancellation_reason %}
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                      Reason: {{ r.cancellation_reason }}
+                    </div>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if r.bus_number %}
+                    <strong style="color: var(--primary);">{{ r.bus_number }}</strong>
+                  {% else %}
+                    <span style="color: var(--text-muted);">&mdash;</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No previous travel requests submitted yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

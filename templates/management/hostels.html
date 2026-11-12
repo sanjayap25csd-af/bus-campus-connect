@@ -1,0 +1,102 @@
+{% extends "management/base_management.html" %}
+
+{% block title %}Hostel Management - Bus Campus Connect{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+  <div>
+    <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em;">Residential Logistics</span>
+    <h1 style="font-size: 2rem; font-weight: 800; margin-top: 0.2rem;">Campus Hostels</h1>
+    <p style="color: var(--text-secondary); font-size: 0.92rem;">
+      Manage active hostel residences. Newly added hostels automatically populate in Student Registration.
+    </p>
+  </div>
+
+  <button type="button" onclick="openModal('addHostelModal')" class="btn btn-primary">
+    + Add New Hostel
+  </button>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--primary);"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+      <span>Hostels &amp; Enrolled Residents ({{ hostels|length }})</span>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Hostel ID</th>
+          <th>Hostel Name</th>
+          <th>Registered Students</th>
+          <th>Status</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in hostels %}
+          <tr>
+            <td>#{{ h.id }}</td>
+            <td><strong style="font-size: 1rem; color: var(--text-primary);">{{ h.hostel_name }}</strong></td>
+            <td>
+              <span class="badge badge-info" style="font-size: 0.85rem;">
+                {{ h.student_count }} Students
+              </span>
+            </td>
+            <td>
+              <span class="badge {% if h.status == 'Active' %}badge-success{% else %}badge-secondary{% endif %}">
+                {{ h.status }}
+              </span>
+            </td>
+            <td style="font-size: 0.82rem; color: var(--text-muted);">{{ h.created_at }}</td>
+            <td>
+              <div style="display: flex; gap: 0.5rem;">
+                <form action="{{ url_for('hostel.toggle_status', hostel_id=h.id) }}" method="POST">
+                  <button type="submit" class="btn btn-secondary btn-sm" style="font-size: 0.75rem;">
+                    {% if h.status == 'Active' %}Deactivate{% else %}Activate{% endif %}
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal: Add New Hostel (Requirement 33) -->
+<div id="addHostelModal" class="modal-backdrop">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 style="font-size: 1.15rem; font-weight: 800;">Add New Campus Hostel</h3>
+      <button type="button" onclick="closeModal('addHostelModal')" style="background:none; border:none; font-size:1.25rem; cursor:pointer;">&times;</button>
+    </div>
+    <form action="{{ url_for('hostel.add_hostel') }}" method="POST">
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Hostel Name <span class="required">*</span></label>
+          <input type="text" name="hostel_name" class="form-control" placeholder="Enter hostel name" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-control">
+            <option value="Active" selected>Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick="closeModal('addHostelModal')" class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Hostel &rarr;</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

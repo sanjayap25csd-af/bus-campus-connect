@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile - Bus Campus Connect{% endblock %}
+
+{% block content %}
+<div class="student-content" style="max-width: 700px; margin: 2rem auto;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="color: var(--primary);"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <span>Student Profile</span>
+      </div>
+      <span class="badge {% if student.verification_status == 'Verified' %}badge-success{% elif student.verification_status == 'Rejected' %}badge-danger{% else %}badge-warning{% endif %}">
+        ID Status: {{ student.verification_status }}
+      </span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Full Name</span>
+        <div style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary);">{{ student.name }}</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Register Number</span>
+        <div style="font-size: 1.1rem; font-weight: 700;"><span class="table-reg-no">{{ student.register_number }}</span></div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Hostel Residence</span>
+        <div style="font-size: 1rem; font-weight: 700; color: var(--primary);">{{ student.hostel_name }}</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Department</span>
+        <div style="font-size: 1rem; font-weight: 600;">{{ student.department }} (Year {{ student.year }})</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Email Address</span>
+        <div style="font-size: 0.95rem;">{{ student.email }}</div>
+      </div>
+
+      <div>
+        <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Phone Number</span>
+        <div style="font-size: 0.95rem;">{{ student.phone }}</div>
+      </div>
+    </div>
+
+    <!-- College ID Card Document Preview -->
+    <div style="border-top: 1px solid var(--border-light); padding-top: 1.5rem;">
+      <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.75rem;">College ID Card Document</h4>
+      {% if student.id_card_path %}
+        <div style="padding: 1rem; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <strong>File:</strong> {{ student.id_card_path }}
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Verified by campus transport administration</div>
+          </div>
+          <a href="{{ url_for('uploaded_file', folder='id_cards', filename=student.id_card_path) }}" target="_blank" class="btn btn-secondary btn-sm">
+            View ID Card &nearr;
+          </a>
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.88rem;">No ID card on file.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
